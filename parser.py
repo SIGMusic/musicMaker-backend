@@ -1,6 +1,3 @@
-import numpy as np
-#import pandas as pd
-import re
 import os
 
 # Create Chord class
