@@ -22,7 +22,8 @@ def get_chord_list (filepath):
         # Read meta-data
         if line[0] == "#":
             if line.find("# tonic: ") != -1:
-                tonic = line[9:]
+                # cut off '# tonic: ' from beginning and '\n' from end
+                tonic = line[9:-1]
         else:
             # Read chord data
             first_comma = line.find(',')
@@ -65,3 +66,6 @@ def get_all_data (parent_folder):
         else:
             data[tonic] = [chordList]
     return data
+
+# Test
+print(get_chord_list("C:/Users/sahil/OneDrive/Documents/GitHub/musicMaker-backend/McGill-Billboard/0003/salami_chords.txt"))
