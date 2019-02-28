@@ -10,10 +10,7 @@ class Chord:
 
 # Fill in list of chord names/durations for each musical section
 #  return (tonic, chordlist)
-def get_chord_list (filepath):
-    # Sample return so that getAllData runs correctly
-    #return 'A:min', ['A:min', 'D:maj', 'A:min']
-    
+def get_chord_list (filepath):    
     # Iterate over lines in file
     chord_file = open(filepath)
     song_chord_list = []
@@ -37,7 +34,7 @@ def get_chord_list (filepath):
                 # Store the section label -- not used now, but stored in case we want it
                 second_comma = line.find(',', first_comma)
                 if second_comma != -1:
-                    setction_label = line[first_comma + 2: second_comma]
+                    section_label = line[first_comma + 2: second_comma]
             
             # Slowly append each chord and cut it off from remaining_line 
             remaining_line = line[line.find("|") + 1:]
@@ -105,4 +102,4 @@ def get_all_data (parent_folder):
     return data
 
 # Test
-print(get_chord_list("C:/Users/sahil/OneDrive/Documents/GitHub/musicMaker-backend/McGill-Billboard/0006/salami_chords.txt"))
+print(get_chord_list("McGill-Billboard/0003/salami_chords.txt"))
