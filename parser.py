@@ -68,4 +68,4 @@ def get_all_data (parent_folder):
     return data
 
 # Test
-print(get_chord_list("C:/Users/sahil/OneDrive/Documents/GitHub/musicMaker-backend/McGill-Billboard/0003/salami_chords.txt"))
+print(get_chord_list("McGill-Billboard/0003/salami_chords.txt"))
