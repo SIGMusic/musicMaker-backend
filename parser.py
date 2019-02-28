@@ -54,6 +54,7 @@ def get_chord_list (filepath):
                     repeat = False
                     if(chord_name.find(".")==-1):
                         if(chord_name.find(":")==-1):
+                            remaining_beat = remaining_beat[next_space + 1:]
                             continue
                     else:
                         repeat = True
@@ -102,4 +103,4 @@ def get_all_data (parent_folder):
     return data
 
 # Test
-print(get_chord_list("McGill-Billboard/0003/salami_chords.txt"))
+print(get_chord_list("McGill-Billboard/0089/salami_chords.txt"))
