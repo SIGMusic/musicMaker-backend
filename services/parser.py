@@ -75,7 +75,7 @@ def get_chord_list (filepath):
                     chord.duration/=chord_duration_sum
 
                 # Check for repeats between measures
-                if len(section_chord_list) != 0 and section_chord_list[-1].chord == measure_chord_list[0].chord:
+                if len(section_chord_list) != 0 and len(measure_chord_list) != 0 and section_chord_list[-1].chord == measure_chord_list[0].chord:
                     section_chord_list[-1].duration += measure_chord_list[0].duration
                     measure_chord_list.pop(0)
 
@@ -103,7 +103,7 @@ def get_all_data (parent_folder):
     data = dict()
     # Call getChordList on every file in the dataset
     for folder in os.listdir(parent_folder):
-        tonic, chordList = get_chord_list(parent_folder + "/" + folder + "/salami-chords.txt")
+        tonic, chordList = get_chord_list(parent_folder + "/" + folder + "/salami_chords.txt")
         # Add each song's chordList to the dictionary by tonic
         if tonic in data:
             data[tonic].append(chordList)
@@ -112,4 +112,5 @@ def get_all_data (parent_folder):
     return data
 
 # Test
-print(get_chord_list("McGill-Billboard/0089/salami_chords.txt"))
+#print(get_chord_list("McGill-Billboard/0089/salami_chords.txt"))
+print(get_all_data("McGill-Billboard"))
