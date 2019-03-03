@@ -13,6 +13,7 @@ class Chord:
 def get_chord_list (filepath):    
     # Iterate over lines in file
     chord_file = open(filepath)
+    tonic = []
     song_chord_list = []
     section_chord_list = []
     for line in chord_file:
@@ -21,7 +22,7 @@ def get_chord_list (filepath):
         if line[0] == "#":
             if line.find("# tonic: ") != -1:
                 # cut off '# tonic: ' from beginning and '\n' from end
-                tonic = line[9:-1]
+                tonic.append(line[9:-1])
         else:
             # Read chord data
             first_comma = line.find(',')
@@ -93,7 +94,6 @@ def get_chord_list (filepath):
                 for chord in section_chord_list[section_chord_list_beginning_index:]:
                     chord.duration *= multiplier
 
-            
     return tonic, song_chord_list
 
 # Call getChordList for each file inside parent folder and organize based on tonic
@@ -111,6 +111,13 @@ def get_all_data (parent_folder):
             data[tonic] = [chordList]
     return data
 
+# Convert a given (tonic, chordList) into key-irrespective form
+#  Ex: [1:maj, 2:min]
+def key_irrespective_list (tonic, chordList):
+    # Ignore lists where there are key changes
+    if(len(tonic) == 0):
+        pass
+
 # Test
 #print(get_chord_list("McGill-Billboard/0089/salami_chords.txt"))
-print(get_all_data("McGill-Billboard"))
+print(get_all_data("../data/McGill-Billboard/McGill-Billboard"))
