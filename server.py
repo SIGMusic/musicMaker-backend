@@ -2,14 +2,14 @@ from flask import Flask
 from flask_restful import Resource, Api
 from flask_jsonpify import jsonify
 
-from services.dummy_function import get_chord_probabilities
+from services.chord_stats import getNextChord
 
 app = Flask(__name__)
 api = Api(app)
 
 class NextChord(Resource):
     def get(self, chord):
-        return jsonify(get_chord_probabilities(chord))
+        return jsonify(getNextChord([chord], depth=None))
 
 api.add_resource(NextChord, "/next/<chord>")
 
