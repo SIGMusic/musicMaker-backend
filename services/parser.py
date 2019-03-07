@@ -47,6 +47,7 @@ def get_chord_list (filepath):
                 # Chop up measure by chord, identified by spaces
                 measure_chord_list = []
                 remaining_measure = measure[measure.find(" ") + 1:]
+                previous_N = False
                 while remaining_measure.find(" ") != -1:
                     #print("Remaining Measure: " + remaining_beat)
                     next_space = remaining_measure.find(" ")
@@ -56,14 +57,21 @@ def get_chord_list (filepath):
                     if(chord_name.find(".")==-1):
                         if(chord_name.find(":")==-1):
                             remaining_measure = remaining_measure[next_space + 1:]
+                            previous_N = True
                             continue
                     else:
                         repeat = True
                     #print("Chord: " + chord_name)
-                    if len(measure_chord_list) != 0 and repeat:
+                    if len(measure_chord_list) != 0 and repeat and not previous_N:
                         measure_chord_list[-1].duration += 1
+                    elif repeat and previous_N:
+                        # If a . comes after an N, also ignore the . and record previous_N as true still
+                        #  in case of "N . . . ."
+                        remaining_measure = remaining_measure[next_space + 1:]
+                        continue
                     else:
                         measure_chord_list.append(Chord(chord_name, 1))
+                    previous_N = False
                     remaining_measure = remaining_measure[next_space + 1:]
 
                 # Convert duration measurements into units of measures
@@ -96,28 +104,115 @@ def get_chord_list (filepath):
 
     return tonic, song_chord_list
 
-# Call getChordList for each file inside parent folder and organize based on tonic
+# Call get_chord_list for each file inside parent folder and organize based on tonic
+# parent_folder should be set to "../data/McGill-Billboard"
 # return dictionary (key, value) = (tonic, a list of arrays where each array is the chord list of a song)
 def get_all_data (parent_folder):
     # Create dictionary to store chordLists by tonic
     data = dict()
     # Call getChordList on every file in the dataset
     for folder in os.listdir(parent_folder):
-        tonic, chordList = get_chord_list(parent_folder + "/" + folder + "/salami_chords.txt")
-        # Add each song's chordList to the dictionary by tonic
-        if tonic in data:
-            data[tonic].append(chordList)
+        tonic, chord_list = get_chord_list(parent_folder + "/" + folder + "/salami_chords.txt")
+        # Add each song's chordList to the dictionary by first tonic
+        if tonic[0] in data:
+            data[tonic[0]].append(chord_list)
         else:
-            data[tonic] = [chordList]
+            data[tonic[0]] = [chord_list]
     return data
 
 # Convert a given (tonic, chordList) into key-irrespective form
 #  Ex: [1:maj, 2:min]
-def key_irrespective_list (tonic, chordList):
+#  "x:__" represents a non-diatonic chord or other error
+#  returns a new chord_list if applicable
+#  return empty list if there are key changes or any errors in tonic
+def key_irrespective_list (tonic_list, chord_list):
+    new_chord_list = []
     # Ignore lists where there are key changes
-    if(len(tonic) == 0):
-        pass
+    if len(tonic_list) == 1:
+        tonic = tonic_list[0]
+        # If tonic has double sharps or flats, ignore the list
+        if len(tonic) <=2:
+            # Create notes list to reference later. Only sharps are used. Any flats can look to one index previous!
+            notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+
+            # Record intervals for a general scale (2 = whole step, 1 = half step)
+            #  We don't need to know if the song is major or minor because we will just set the tonic to 6
+            #  in the case of a minor, and all the chord_types are preserved
+            intervals = [2, 2, 1, 2, 2, 2, 1]
+
+            # TODO: We don't deal with harmonic or melodic minor AT ALL. This only works for natural minor scales :(
+
+            try:
+                tonic_index = notes.index(tonic)
+            except:
+                # If tonic has a flat in it, use the index before the base note
+                tonic_index = notes.index(tonic[:1]) - 1
+
+            new_chord_list = []
+            for section_chord_list in chord_list:
+                new_section_chord_list = []
+                for chord in section_chord_list:
+                    error = False
+                    chord_root = chord.chord[:chord.chord.find(":")]
+                    chord_type = chord.chord[chord.chord.find(":"):]
+                    try:
+                        chord_index = notes.index(chord_root)
+                    except:
+                        try:
+                            # If chord name has a flat in it, use the index before the base note
+                            chord_index = notes.index(chord_root[:1]) - 1
+                        except:
+                            # Chord name not properly formatted
+                            error = True
+                    
+                    if not error:
+                        # Find now much forward the chord_index is compared to the tonic
+                        index_difference = (chord_index - tonic_index + len(notes)) % len(notes)
+                        interval_sum = 0
+                        interval_index_counter = 0
+                        diatonic = True
+                        #print("Difference between", tonic, "and", chord_root, ":", index_difference)
+                        while diatonic and interval_sum != index_difference:
+                            #print("Counter:", interval_index_counter)
+                            # If the chord can't be found within our intervals, it is non-diatonic
+                            try:
+                                interval_sum += intervals[interval_index_counter]
+                            except:
+                                diatonic = False
+                            interval_index_counter += 1
+
+                        if(diatonic):
+                            # Since a 1 chord is tonic, add 1 to the interval_index_counter
+                            chord_root_num = interval_index_counter + 1
+                        else:
+                            chord_root_num = "x"
+
+                        new_section_chord_list.append(Chord(str(chord_root_num) + chord_type, chord.duration))
+                    else:
+                        # If something goes wrong, don't add the chord to the new list.
+                        #  Seems like I've gotten rid of all errors, but I'm keeping this in here just in case.
+                        print("There was an error with chord:", chord)
+
+                new_chord_list.append(new_section_chord_list)
+                new_section_chord_list = []
+            
+    return new_chord_list
+            
+# Call get_chord_list for each file inside parent folder and convert it to key_irrespective
+# parent_folder should be set to "../data/McGill-Billboard"
+# return dictionary (key, value) = (tonic, a list of arrays where each array is the chord list of a song)
+def get_all_data_key_irrespective (parent_folder):
+    # Create list to store chordLists
+    data = []
+    # Call get_chord_list on every file in the dataset
+    for folder in os.listdir(parent_folder):
+        tonic, chord_list = get_chord_list(parent_folder + "/" + folder + "/salami_chords.txt")
+        # Add each song's chord_list to the list
+        data.append(key_irrespective_list(tonic, chord_list))
+    return data
 
 # Test
-#print(get_chord_list("McGill-Billboard/0089/salami_chords.txt"))
-print(get_all_data("../data/McGill-Billboard/McGill-Billboard"))
+#print(get_chord_list("../data/McGill-Billboard/0089/salami_chords.txt"))
+print(get_all_data_key_irrespective("../data/McGill-Billboard"))
+#print(get_all_data("../data/McGill-Billboard"))
+#get_all_data("../data/McGill-Billboard")
