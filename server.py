@@ -8,6 +8,10 @@ from services.chord_notation_converter import convert
 app = Flask(__name__)
 api = Api(app)
 
+class GetChordName(Resource):
+    def get(self):
+
+
 class NextChord(Resource):
     def get(self):
         midi_chord = request.args.getlist('chord')[0].split(',')
