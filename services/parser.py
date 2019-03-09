@@ -311,3 +311,14 @@ for note in notes:
     print(note, "with tonic C:", key_irrespective_chord("C", McGillChord(note + ":maj"), True))
 print(key_irrespective_chord("C", McGillChord("Bb:min"), True))
 #print(key_irrespective_chord("A", McGillChord("G:min")))
+=======
+# Convert a given (tonic, chordList) into key-irrespective form
+#  Ex: [1:maj, 2:min]
+def key_irrespective_list (tonic, chordList):
+    # Ignore lists where there are key changes
+    if(len(tonic) == 0):
+        pass
+
+# Test
+#print(get_chord_list("McGill-Billboard/0089/salami_chords.txt"))
+print(get_all_data("../data/McGill-Billboard/McGill-Billboard"))
