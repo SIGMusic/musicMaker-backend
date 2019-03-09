@@ -19,9 +19,6 @@ class McGillChord:
             chord_quality = self.chord[self.chord.find(":") + 1:self.chord.find("/")]
             chord_bass = self.chord[self.chord.find("/") + 1:]
 
-        if chord_quality == 'ma':
-            print(self)
-
         # Create notes list to reference later. Only sharps are used. Any flats can look to one index before their base.
         notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
         # Record intervals for a generic scale (2 = whole step, 1 = half step)
@@ -306,19 +303,19 @@ def get_all_data_key_irrespective (parent_folder, pychord_chord = False):
 #get_all_data_key_irrespective("../data/McGill-Billboard")
 #print(get_all_data("../data/McGill-Billboard"))
 #get_all_data("../data/McGill-Billboard")
-notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-for note in notes:
-    print(note, "with tonic C:", key_irrespective_chord("C", McGillChord(note + ":maj"), True))
-print(key_irrespective_chord("C", McGillChord("Bb:min"), True))
+#notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+#for note in notes:
+#    print(note, "with tonic C:", key_irrespective_chord("C", McGillChord(note + ":maj"), True))
+#print(key_irrespective_chord("C", McGillChord("Bb:min"), True))
 #print(key_irrespective_chord("A", McGillChord("G:min")))
-=======
-# Convert a given (tonic, chordList) into key-irrespective form
-#  Ex: [1:maj, 2:min]
-def key_irrespective_list (tonic, chordList):
-    # Ignore lists where there are key changes
-    if(len(tonic) == 0):
-        pass
 
 # Test
 #print(get_chord_list("McGill-Billboard/0089/salami_chords.txt"))
-print(get_all_data("../data/McGill-Billboard/McGill-Billboard"))
+#data = get_all_data_key_irrespective("../data/McGill-Billboard")
+#noneCount = 0
+#for song in data:
+#    for section in song:
+#        for chord in section:
+#            if chord == None:
+#                noneCount += 1
+#print(noneCount)
