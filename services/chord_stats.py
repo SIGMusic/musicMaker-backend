@@ -1,6 +1,6 @@
 import numpy as np
 
-class chord_stats():
+class chord_stats:
     def __init__(self, depth):
         self.depth = depth
         self.songs = []
@@ -15,7 +15,11 @@ class chord_stats():
 
     def analyse_song_helper(self, song, depth):
         #Do something
-        pass
+        for i in range(len(song)-depth):
+            sample = song[i:i+depth+1]
+            samX = tup(sample[:-1])
+            samY = sample[-1]
+            self.chord_data[samX][samY] = 1+self.chord_data.get(samX, {}).get(samY, 0)
 
     def increase_depth(new_depth):
         if new_depth > depth:
@@ -29,3 +33,12 @@ class chord_stats():
         if depth > self.depth:
             raise Exception("No data for depth "+str(depth))
         return self.chord_data[tuple(past_chords[:-depth])]
+
+class chord_stats_tester:
+    def __init__(self):
+        self.testAnalyseSong()
+        self.testIncreaseDepth()
+    def testAnalyseSong():
+        print("Test Missing")
+    def testIncreaseDepth():
+        print("Test Missing")
