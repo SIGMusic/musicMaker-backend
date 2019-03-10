@@ -3,6 +3,17 @@ import pychord
 
 # Create McGillChord class
 class McGillChord:
+    """
+    Store the name of a chord and its duration.
+
+    Members:
+        duration -- The duration of a chord in musical measures as a float. Defaults to 1.
+        key_irrespective -- A boolean value that relates to the way in which the name is stored. Defaults to False.
+        chord -- The name of the chord in the below formats. Bass values are asummed to equal the root if ommited. 
+            > If not key irrespective, names are in format <Root>:<Quality>/<Bass>
+            > If key irrespective, names are in format <Numeral>:<Quality>/<Bass> where <Numeral> = 1 would indicate a tonic chord
+            > Quality specifications are stored according to http://ismir2005.ismir.net/proceedings/1080.pdf
+    """
     def __init__(self, chord, duration = 1, key_irrespective = False):
         self.chord = chord
         self.duration = duration
@@ -10,6 +21,11 @@ class McGillChord:
     def __repr__(self):
         return self.chord + " x" + str(self.duration)
     def toPychord(self):
+        """
+        Convert this Chord object to a pychord.Chord.
+
+        If this Chord is key irrespective, it is put into the key of C
+        """
         chord_root = self.chord[:self.chord.find(":")]
         find_bass = self.chord.find("/")
         if find_bass == -1:
@@ -70,9 +86,16 @@ class McGillChord:
         
         return result_chord
 
-# Fill in list of chord names/durations for each musical section
-#  return (tonic, chordlist)
-def get_chord_list (filepath, pychord_chord = False):    
+def get_chord_list (filepath, pychord_chord = False):  
+    """
+    Fill in list of chord names/durations for each musical section
+
+    Parameters:
+        filepath -- The path the text file containing chord annotations
+        pychord_chord -- If True, returns a list of pychord.Chord objects. Otherwise, returns a McGillChord object. 
+
+    Return (tonic, chord_list) where tonic is a list of all tonics in the song and chord_list is a 2D list with dimmensions (musical section, chord)
+    """  
     # Iterate over lines in file
     chord_file = open(filepath)
     tonic = []
@@ -169,10 +192,15 @@ def get_chord_list (filepath, pychord_chord = False):
 
     return tonic, song_chord_list
 
-# Call get_chord_list for each file inside parent folder and organize based on tonic
-# parent_folder should be set to "../data/McGill-Billboard"
-# return dictionary (key, value) = (tonic, a list of arrays where each array is the chord list of a song)
 def get_all_data (parent_folder, pychord_chord = False):
+    """
+    Call get_chord_list for each file inside parent folder and organize based on tonic.
+
+    Parameters:
+        parent_folder -- the folder containing subfolders, each of which should contain annotation text files.
+    
+    Return a dictionary (key, value) = (tonic, 3D list of dimmensions (song, musical sections, chord)).
+    """
     # Create dictionary to store chordLists by tonic
     data = dict()
     # Call getChordList on every file in the dataset
@@ -185,14 +213,25 @@ def get_all_data (parent_folder, pychord_chord = False):
             data[tonic[0]] = [chord_list]
     return data
 
-# Convert a McGillChord object into key irrespective notation for a given tonic
-#  Exs: 1:maj, 2:min, 3:min, 4:maj, 5:maj, 6:min, 7:dim
-#  For minor chords, you may see 3:maj for a III or 7b:maj for a VII in natural minor
-#
-#  Note: chord types (':maj' or ':min') are not converted AT ALL. This function only converts the root name,
-#   hence the use of '7b:maj' for VII, which uses a different 7th than a vii0 would.
-#   Also, "x:__" represents a non-diatonic chord or other error
 def key_irrespective_chord (tonic, chord, pychord_chord = False):
+    """
+    Convert a McGillChord object into key irrespective notation for a given tonic
+    Exs: 1:maj, 2:min, 3:min, 4:maj, 5:maj, 6:min, 7:dim
+    
+    Parameters:
+        tonic -- The tonic not by which to transpose the chord
+        chord -- The McGillChord object to convert
+        pychord_chord -- Decides return type of McGillChord or pychord.Chord
+    
+    Return type notes:
+        For minor chords, you may see 3:maj for a III or 7b:maj for a VII in natural minor
+        Chord qualities (':maj' or ':min') are not converted AT ALL. This function only converts the root name, hence the use of '7b:maj' for VII, which uses a different 7th than a vii0 would.
+        Non-diatonic chords are represented with "x:__"
+    """
+    # Check if chord is already key irrespective
+    if chord.key_irrespective:
+        return chord
+
     # Create notes list to reference later. Only sharps are used. Any flats can look to one index before their base.
     notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 
@@ -263,11 +302,19 @@ def key_irrespective_chord (tonic, chord, pychord_chord = False):
         # If something goes wrong, don't add the chord to the new list.
         #  Seems like I've gotten rid of all errors, but I'm keeping this in here just in case.
         print("There was an error with chord:", chord)
+        return None
 
-# Convert a given (tonic, chordList) into key-irrespective form
-#  returns a new chord_list if applicable
-#  return empty list if there are key changes or any errors in tonic
 def key_irrespective_list (tonic_list, chord_list, pychord_chord = False):
+    """
+    Convert a given (tonic, chordList) into key-irrespective form
+    
+    Parameters:
+        tonic_list -- The list of tonics as returned from get_chord_list
+        chord_list -- The list of chords as returned from get_chord_list
+        pychord_chord -- Decides return type of McGillChord or pychord.Chord
+
+    Returns a new chord_list if applicable or an empty list if there are key changes or any errors in tonic
+    """
     new_chord_list = []
     # Ignore lists where there are key changes
     if len(tonic_list) == 1:
@@ -283,10 +330,15 @@ def key_irrespective_list (tonic_list, chord_list, pychord_chord = False):
             
     return new_chord_list
 
-# Call get_chord_list for each file inside parent folder and convert it to key irrespective
-# parent_folder should be set to "../data/McGill-Billboard"
-# return list of lists where each inner list is the key irrespective chord list of a song
 def get_all_data_key_irrespective (parent_folder, pychord_chord = False):
+    """
+    Call get_chord_list for each file inside parent folder and convert it to key irrespective
+
+    Parameters:
+        pychord_chord -- Decides return type of McGillChord or pychord.Chord
+
+    Return 3D list of dimmensions (song, section, key irrespective chord)
+    """
     # Create list to store chordLists
     data = []
     # Call get_chord_list on every file in the dataset
