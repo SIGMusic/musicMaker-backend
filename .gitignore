@@ -1,1 +1,14 @@
+<<<<<<< HEAD
 data/McGill-Billboard/
+=======
+# data
+data/McGill-Billboard/
+
+# misc
+.idea/*
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+>>>>>>> f8e634648ba88348ff11d616d53a7d81182c5b9d
