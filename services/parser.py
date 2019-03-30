@@ -66,7 +66,7 @@ class McGillChord:
         #  reveals that 'maj' => 'M' if not alone and 'min' => 'm' if not alone are the only
         #  required conversions
         new_quality = chord_quality
-        if new_quality.find('maj') != -1 and new_quality != 'maj':
+        """if new_quality.find('maj') != -1 and new_quality != 'maj':
             new_quality = new_quality.replace('maj', 'M')
         if new_quality.find('min') != -1 and new_quality != 'min':
             new_quality = new_quality.replace('min', 'm')
@@ -83,13 +83,35 @@ class McGillChord:
         if new_quality.find('6'):
             new_quality = new_quality.replace('6', '')
         if new_quality == 'M(b7)':
-            new_quality = new_quality.replace('M(b7)', 'm7')
+            new_quality = new_quality.replace('M(b7)', 'm7')"""
+        if 'maj' in new_quality and new_quality != 'maj':
+            # Replace 'maj' with 'M' for 7th chords
+            new_quality = new_quality.replace('maj', 'M')
+        if 'min' in new_quality and new_quality != 'min':
+            # Replace 'min' with 'm' for 7th chords
+            new_quality = new_quality.replace('min', 'm')
+        if 'hdim7' in new_quality:
+            new_quality = new_quality.replace('hdim7', 'm7-5')
+        # Remove parenthesis from qualities
+        if '(' in new_quality:
+            new_quality = new_quality.replace('(', '')
+        if ')' in new_quality:
+            new_quality = new_quality.replace(')', '')
+        
 
         # Create pychord.Chord with converted values (excluding bass)
         try:
             result_chord = pychord.Chord(chord_root + new_quality)
         except:
-            return None
+            if 'maj' in new_quality or 'M' in new_quality:
+                new_quality = 'maj'
+            elif 'min' in new_quality or 'm' in new_quality:
+                new_quality = 'min'
+            try:
+                result_chord = pychord.Chord(chord_root + new_quality)
+            except:
+                # Something is funky with the formatting
+                return None
         
         # If no bass or unreadable bass, return un-inverted chord
         try:
