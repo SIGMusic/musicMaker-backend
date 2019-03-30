@@ -19,7 +19,7 @@ class chord_stats:
 
     def analyse_songs(self, songs):
         for i in range(len(songs)):
-            songs[i] = [item for sublist in songs[i] for item in sublist]
+            songs[i] = [str(item) for sublist in songs[i] for item in sublist]
 
         for song in songs:
             self.analyse_song(song)
