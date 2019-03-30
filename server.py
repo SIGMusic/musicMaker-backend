@@ -25,9 +25,7 @@ class GetNextChord(Resource):
         analyzer = chord_stats(len(chords))
         analyzer.analyse_songs(get_all_data_key_irrespective("data/McGill-Billboard"))
 
-        return {0:get_all_data_key_irrespective("data/McGill-Billboard")}
-
-        #return jsonify(analyzer.get_next_chord(chords, depth=None))
+        return jsonify(analyzer.get_next_chord(chords, depth=None))
 
 
 api.add_resource(GetChordName, "/chordname")
