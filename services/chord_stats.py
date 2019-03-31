@@ -17,6 +17,13 @@ class chord_stats:
         for d in range(1,self.depth+1):
             self.analyse_song_helper(song, d)
 
+    def analyse_songs(self, songs):
+        for i in range(len(songs)):
+            songs[i] = [str(item) for sublist in songs[i] for item in sublist]
+
+        for song in songs:
+            self.analyse_song(song)
+
     def analyse_song_helper(self, song, depth):
         '''
         Helper function for analysing songs, which analyses at a the given depth only
@@ -34,7 +41,7 @@ class chord_stats:
                 self.chord_data[samX] = {}
             self.chord_data[samX][samY] = 1+self.chord_data.get(samX, {}).get(samY, 0)
 
-    def increase_depth(new_depth):
+    def increase_depth(self, new_depth):
         '''
         Increases the number of preceding chords that this object analyses and analyses currently
         held songs to that depth
@@ -44,8 +51,8 @@ class chord_stats:
         returns:
             None
         '''
-        if new_depth > depth:
-            for i in range(depth+1, new_depth+1):
+        if new_depth > self.depth:
+            for i in range(self.depth+1, new_depth+1):
                 for song in self.songs:
                     self.analyse_song_helper(song, i)
 
@@ -96,4 +103,4 @@ class chord_stats_tester:
     def testIncreaseDepth(self):
         print("Test Missing: increase_depth()")
 
-chord_stats_tester()
+#chord_stats_tester()

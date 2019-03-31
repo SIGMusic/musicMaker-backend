@@ -66,13 +66,52 @@ class McGillChord:
         #  reveals that 'maj' => 'M' if not alone and 'min' => 'm' if not alone are the only
         #  required conversions
         new_quality = chord_quality
-        if chord_quality.find('maj') != -1 and chord_quality != 'maj':
+        """if new_quality.find('maj') != -1 and new_quality != 'maj':
             new_quality = new_quality.replace('maj', 'M')
-        if chord_quality.find('min') != -1 and chord_quality != 'min':
+        if new_quality.find('min') != -1 and new_quality != 'min':
             new_quality = new_quality.replace('min', 'm')
+        if new_quality.find('hdim7') != -1:
+            new_quality = new_quality.replace('hdim7', 'm7-5')
+        if new_quality.find('(9)') != -1:
+            new_quality = new_quality.replace('(9)', '9')
+        if new_quality.find('(11)') != -1:
+            new_quality = new_quality.replace('(11)', '')
+        if new_quality == 'M':
+            new_quality = new_quality.replace('M', 'maj')
+        if new_quality == 'M6':
+            new_quality = new_quality.replace('M6', '6')
+        if new_quality.find('6'):
+            new_quality = new_quality.replace('6', '')
+        if new_quality == 'M(b7)':
+            new_quality = new_quality.replace('M(b7)', 'm7')"""
+        if 'maj' in new_quality and new_quality != 'maj':
+            # Replace 'maj' with 'M' for 7th chords
+            new_quality = new_quality.replace('maj', 'M')
+        if 'min' in new_quality and new_quality != 'min':
+            # Replace 'min' with 'm' for 7th chords
+            new_quality = new_quality.replace('min', 'm')
+        if 'hdim7' in new_quality:
+            new_quality = new_quality.replace('hdim7', 'm7-5')
+        # Remove parenthesis from qualities
+        if '(' in new_quality:
+            new_quality = new_quality.replace('(', '')
+        if ')' in new_quality:
+            new_quality = new_quality.replace(')', '')
+        
 
         # Create pychord.Chord with converted values (excluding bass)
-        result_chord = pychord.Chord(chord_root + new_quality)
+        try:
+            result_chord = pychord.Chord(chord_root + new_quality)
+        except:
+            if 'maj' in new_quality or 'M' in new_quality:
+                new_quality = 'maj'
+            elif 'min' in new_quality or 'm' in new_quality:
+                new_quality = 'min'
+            try:
+                result_chord = pychord.Chord(chord_root + new_quality)
+            except:
+                # Something is funky with the formatting
+                return None
         
         # If no bass or unreadable bass, return un-inverted chord
         try:
@@ -81,8 +120,11 @@ class McGillChord:
             return result_chord
 
         # Configure bass
-        chord_notes = list(result_chord.components)
-        result_chord = pychord.Chord(chord_root + new_quality + "/" + chord_notes[int(chord_bass) - 1])
+        chord_notes = list(result_chord.components())
+        try:
+            result_chord = pychord.Chord(chord_root + new_quality + "/" + chord_notes[int(chord_bass) - 3])
+        except:
+            pass
         
         return result_chord
 
@@ -330,7 +372,7 @@ def key_irrespective_list (tonic_list, chord_list, pychord_chord = False):
             
     return new_chord_list
 
-def get_all_data_key_irrespective (parent_folder, pychord_chord = False):
+def get_all_data_key_irrespective (parent_folder, pychord_chord = True):
     """
     Call get_chord_list for each file inside parent folder and convert it to key irrespective
 
