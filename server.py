@@ -11,6 +11,12 @@ app = Flask(__name__)
 api = Api(app)
 
 class GetChordName(Resource):
+    """
+    Creates an object that allows API calls to determine the name of the chord from MIDI numbers
+    Up to 7 notes can be inputted
+
+    API call is structeurd as /chordname?notes=arg1,arg2,...,arg7
+    """
     def get(self):
         midi_chord = request.args.getlist('notes')[0].split(',')
         pychord_chord = note_to_chord([note_to_name(int(i)) for i in midi_chord])
@@ -19,6 +25,11 @@ class GetChordName(Resource):
         return jsonify(result_dict)
 
 class GetNextChord(Resource):
+    """
+    Creates an object that allows API calls to determine the next chord from an arbitrary lenght list of preivous chords
+
+    API call is structured as /nextchord?chords=arg1,arg2,...,argn
+    """
     def get(self):
         chords = request.args.getlist('chords')[0].split(',')
 
