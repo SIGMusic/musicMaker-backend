@@ -3,86 +3,30 @@
 2019 EoH SIGMusic Project   
 [Frontend Repo](https://github.com/SIGMusic/musicMaker-frontend)
 
+The Music Maker Backend is a rest API made using Flask. At the moment, it has two main services: getting the name of the chord from the notes, then getting the next chord from a list of previous chords.
+
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+Clone the repository onto your local machine by running `git clone https://github.com/SIGMusic/musicMaker-backend.git`
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+To install the dependencies for the repository, run -r `pip install requirements.txt` in your virtualenv.
+
+## How to use the API
+
+###### Chord name from notes
 
 ```
-Give examples
+http://127.0.0.1:5000/chordname?notes=arg1,arg2,...,arg7
 ```
 
-### Installing
+In which the args are the midi numbers for each of the notes, up to 7 different notes. It will return a JSON with the name of the chord.
 
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
+###### Next chord from previous chords
 
 ```
-Give the example
+http://127.0.0.1:5000/nextchord?chords=arg1,arg2,...,argn
 ```
 
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+In which the args are the chord names for each of the previosu chords, with an arbitrary number of previous chords. It will return a JSON of next chord names mapped to probabilities of each chord happening.
